@@ -153,6 +153,10 @@
         function merlinProposeVillains(proposes, assumption) {
             var likelihood = 1;
 
+            _.each(proposes, function(propose) {
+
+            });
+
             return likelihood;
         }
 

@@ -123,7 +123,7 @@
 
     /*
         Rule 1: Merlin should not approve any villain except Mordred in a vote
-        - Likelihood: Increased by the number of villains in votes
+        - Likelihood: Increased by the number of villains in votes (base 30%)
         - Edge case: Game 4, where villain tolerance is increased by 1
         - Edge case: Mordred's existence.
      */
@@ -146,7 +146,7 @@
 
     /*
         Rule 2: As the game advances, it is less likely that Merlin proposes villains
-        - Likelihood: Increasing by each round
+        - Likelihood: Increasing by each round (base 70%)
         - Edge case: Game 4, where villain tolerance is increased by 1
         - Edge case: Mordred's existence
      */

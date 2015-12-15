@@ -244,8 +244,8 @@
             this.assasin = assasin;
             this.mordred = mordred;
             this.dummy = dummy;
-            this.villains = [morgana, assasin, mordred, dummy];
-            this.visibleVillains = [morgana, assasin, dummy];
+            this.villains = (dummy !== null) ? [morgana, assasin, mordred, dummy] : [morgana, assasin, mordred];
+            this.visibleVillains = (dummy !== null) ? [morgana, assasin, dummy] : [morgana, assasin];
             this.heroes = [merlin, percival];
         }
 
@@ -293,18 +293,40 @@
             only generate those with a higher possibility.
          */
         function runDeduction() {
+            var resultHash = {}; // {315268407: 0.8, 586472130: 0.4}
+
             var initialArray = []; // [0,1,2,3,4,...]
             for (var i = 0; i < noOfPlayers; i++) {
                 initialArray.push(i);
             }
-
             // Permutation for [0,1,2,3] -> [ [0,1,2,3], [1,0,2,3], [0,1,3,2],... ]
-            var permutation = initialArray.reduce(function permute(res, item, key, arr) {
+            var permutations = initialArray.reduce(function permute(res, item, key, arr) {
                 return res.concat(arr.length > 1 && arr.slice(0, key).concat(arr.slice(key + 1)).reduce(permute, []).map(function(perm) {
                     return [item].concat(perm); }) || item);
                 }, []);
 
-            var assumption = new Assumption();  // function Assumption(merlin, percival, morgana, assasin, mordred, dummy)
+            _.each(permutations, function(permutation) {
+                // function Assumption(merlin, percival, morgana, assasin, mordred, dummy)
+                // omg this is ugly
+                var merlin = permutation[0];
+                var percival = permutation[1];
+                var morgana = permutation[2];
+                var assasin = permutation[3];
+                var mordred = permutation[4];
+                var dummy = (noOfVillains >= 3) ? permutation[5] : null;
+                var assumption = new Assumption(merlin, percival, morgana, assasin, mordred, dummy);
+
+                // chain each validator and calculate the likelihood
+                var likelihood = 1 * merlinApproveVillainInVote(votes, assumption) *
+                                    merlinProposeVillains(proposes, assumption) *
+                                    villainProposeAnotherInRoundFour(proposes, assumption) *
+                                    villainsInFailedMissions(missions, assumption);
+
+                if (likelihood >= possibleThreshold) {
+                    resultHash[permutation.join("")] = likelihood;
+                }
+            });
+
         }
 
     /*

@@ -21,7 +21,7 @@
         high: 1.1
     };
 
-    var possibleThreshold = 0.1;
+    var possibleThreshold = 0.05;
 
     /*
         ---------------------------
@@ -245,10 +245,26 @@
         }
 
         /*
-            Rule 5: Villains tend to reject proposes that does not contain villains
-            - Likelihood: Increasing by each round (base: 150%)
+            Rule 5: Villains tend to not agree with missions without villains in
+            - Likelihood: Decreasing by each round (base: 80%) and by number of villains agreed
             - Edge case: null
          */
+         function villainsRejectProposesWithoutVillains(votes, assumption) {
+             var likelihood = 1;
+
+             _.each(votes, function(vote) {
+                 var villainsInMissionCount = _.intersection(vote.proposee, assumption.villains).length;
+                 var villainsInAgreed = _.intersection(vote.agreed, assumption.villains).length;
+
+                 if ((villainsInMissionCount === 0) && (villainsInAgreed > 0)) {
+                     likelihood *= calcDeduction(0.8, "non-linear", villainsInAgreed, vote.missionNumber, "medium");
+                 }
+             });
+
+             return likelihood;
+         }
+
+
 
     /*
         ---------------------------
@@ -340,10 +356,10 @@
                 var likelihood = 1 * merlinApproveVillainInVote(votes, assumption) *
                                     merlinProposeVillains(proposes, assumption) *
                                     villainProposeAnotherInRoundFour(proposes, assumption) *
-                                    villainsInFailedMissions(missions, assumption);
+                                    villainsInFailedMissions(missions, assumption) *
+                                    villainsRejectProposesWithoutVillains(votes, assumption);
 
                 if (likelihood >= possibleThreshold) {
-                    console.log(permutation);
                     players[merlin].isMerlin += likelihood;
                     players[merlin].isHero += likelihood;
 

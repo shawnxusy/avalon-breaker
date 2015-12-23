@@ -21,7 +21,7 @@
         high: 1.1
     };
 
-    var possibleThreshold = 0.3;
+    var possibleThreshold = 0.1;
 
     /*
         ---------------------------
@@ -103,7 +103,7 @@
      */
         var noOfPlayers, noOfVillains, noOfHeroes, noOfInnos; // noOfPlayers = sum(rest);
 
-        var players; //jshint ignore:line
+        var players = [];
 
 
     /*
@@ -343,6 +343,7 @@
                                     villainsInFailedMissions(missions, assumption);
 
                 if (likelihood >= possibleThreshold) {
+                    console.log(permutation);
                     players[merlin].isMerlin += likelihood;
                     players[merlin].isHero += likelihood;
 
@@ -366,7 +367,6 @@
             });
 
 
-
         }
 
     /*
@@ -381,10 +381,12 @@
             noOfHeroes = 2;
             noOfInnos = 2;
 
-            players = _.fill(Array(noOfPlayers), new Player());
-
+            for (var i = 0; i < noOfPlayers; i++) {
+                var player = new Player();
+                players.push(player);
+            }
             // In this test case:
-            // 2: Merlin, 3: Assasin; 4: Percival; 5: Mordred; 6: Morgana;
+            // 1: Merlin, 2: Assasin; 3: Percival; 4: Mordred; 5: Morgana;
 
             // Round 1
             var propose1 = new Propose(0, 1, [3,4,6]);

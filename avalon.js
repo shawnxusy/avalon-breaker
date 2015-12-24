@@ -165,7 +165,6 @@
                         }
                 }
             });
-            // console.log("========after 1: " + likelihood);
 
             return likelihood;
         }
@@ -202,20 +201,19 @@
         function villainProposeAnotherInRoundFour(proposes, assumption) {
             var likelihood = 1;
 
-            if (proposes.length >= 4) {
-                var propose = proposes[3];
+            _.each(proposes, function(propose) {
+                if (propose.missionNumber == 3) { // Round 4 only
+                    if (_.indexOf(assumption.villains, propose.proposer) !== -1) {
+                        var otherVillainCount = _.intersection(propose.proposee, assumption.villains).length - 1;
+                        likelihood *= (otherVillainCount > 0) ? 1.2 : 1;
 
-                if (_.indexOf(assumption.villains, propose.proposer) !== -1) {
-                    var otherVillainCount = _.intersection(propose.proposee, assumption.villains).length - 1;
-                    likelihood *= (otherVillainCount > 0) ? 1.2 : 1;
-
-                    if (otherVillainCount > 0) {
-                        // console.log("In proposal 4, a villain proposed " + otherVillainCount + " villain(s). " +
-                        //             "Likelihood increased to " + likelihood);
+                        if (otherVillainCount > 0) {
+                            // console.log("In proposal 4, a villain proposed " + otherVillainCount + " villain(s). " +
+                            //             "Likelihood increased to " + likelihood);
+                        }
                     }
                 }
-            }
-
+            })
             return likelihood;
         }
 
@@ -316,7 +314,7 @@
         function runDeduction() {
 
             var initialArray = []; // [0,1,2,3,4,...]
-            for (var i = 1; i < noOfPlayers; i++) {
+            for (var i = 0; i < noOfPlayers; i++) {
                 initialArray.push(i);
             }
             // Permutation for [0,1,2,3] -> [ [0,1,2,3], [1,0,2,3], [0,1,3,2],... ]
@@ -342,7 +340,9 @@
                                     villainProposeAnotherInRoundFour(proposes, assumption) *
                                     villainsInFailedMissions(missions, assumption);
 
-                if (likelihood >= possibleThreshold) {
+                if (likelihood >= 1) {
+                    console.log(assumption);
+                    console.log(likelihood);
                     players[merlin].isMerlin += likelihood;
                     players[merlin].isHero += likelihood;
 
@@ -364,9 +364,6 @@
                     }
                 }
             });
-
-
-
         }
 
     /*

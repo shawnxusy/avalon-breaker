@@ -16,17 +16,34 @@
 </head>
 
 <body>
-    <div class="pre-game row">
-        <div class="col-xs-6">
+    <div class="pre-game">
+        <div>
             <label>Number of players</label>
             <input type="text" name="noOfPlayers" id="no-of-players">
         </div>
-        <a class="col-xs-1 btn btn-info" id="game-start">GO</a>
+        <div>
+            <label>My Role</label>
+            <select id="my-role">
+                <option value="merlin">Merlin</option>
+                <option value="percival">Percival</option>
+                <option value="morgana">Morgana</option>
+                <option value="assasin">Assasin</option>
+                <option value="mordred">Mordred</option>
+                <option value="dummy">Dummy</option>
+            </select>
+        </div>
+        <div>
+            <label>Is dummy in game?</label>
+            <input type="checkbox" id="dummy-in-game">
+        </div>
+        <a class="btn btn-info" id="game-start">GO</a>
     </div>
 
     <div class="game row">
         <div class="game-board col-xs-10">
-
+            <a class="btn btn-warning" id="action-button">Propose</a>
+            <div class="game-board-players">
+            </div>
         </div>
         <div class="game-status col-xs-2">
             <div class="game-status-overall">

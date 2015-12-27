@@ -101,7 +101,7 @@
         8 players: + 2 villager (inno), + 1 dummy (dumm)
         ---------------------------
      */
-        var noOfPlayers, noOfVillains, noOfHeroes, noOfInnos; // noOfPlayers = sum(rest);
+        var noOfPlayers, noOfVillains, noOfHeroes, noOfInnos, dummyInGame; // noOfPlayers = sum(rest);
 
         var players = [];
 
@@ -253,6 +253,26 @@
              return likelihood;
          }
 
+         /*
+            Rule 6: "My role" is certain, so get rid of all other permutations
+            - Likelihood: *0
+            - This is not the most efficient.. but will do for now
+          */
+         function myRoleCertain(myRole, myPosition, assumption) {
+             var imMerlin = (assumption.merlin === myPosition) && (myRole === "merlin");
+             var imPercival = (assumption.percival === myPosition) && (myRole === "percival");
+             var imMorgana = (assumption.morgana === myPosition) && (myRole === "morgana");
+             var imAssasin = (assumption.assasin === myPosition) && (myRole === "assasin");
+             var imMordred = (assumption.mordred === myPosition) && (myRole === "mordred");
+             var imDummy = (assumption.dummy === myPosition) && (myRole === "dummy");
+
+             if (imMerlin || imPercival || imMorgana || imAssasin || imMordred || imDummy) {
+                 return 1;
+             } else {
+                 return 0;
+             }
+         }
+
 
 
     /*
@@ -272,8 +292,8 @@
             this.assasin = assasin;
             this.mordred = mordred;
             this.dummy = dummy;
-            this.villains = (dummy !== null) ? [morgana, assasin, mordred, dummy] : [morgana, assasin, mordred];
-            this.visibleVillains = (dummy !== null) ? [morgana, assasin, dummy] : [morgana, assasin];
+            this.villains = (dummyInGame) ? [morgana, assasin, mordred, dummy] : [morgana, assasin, mordred];
+            this.visibleVillains = (dummyInGame) ? [morgana, assasin, dummy] : [morgana, assasin];
             this.heroes = [merlin, percival];
         }
 
@@ -308,7 +328,7 @@
                 var morgana = permutation[2];
                 var assasin = permutation[3];
                 var mordred = permutation[4];
-                var dummy = (noOfVillains > 3) ? permutation[5] : null;
+                var dummy = dummyInGame ? permutation[5] : null;
                 var assumption = new Assumption(merlin, percival, morgana, assasin, mordred, dummy);
 
                 // chain each validator and calculate the likelihood
@@ -316,7 +336,8 @@
                                     merlinProposeVillains(proposes, assumption) *
                                     villainProposeAnotherInRoundFour(proposes, assumption) *
                                     villainsInFailedMissions(missions, assumption) *
-                                    villainsRejectProposesWithoutVillains(votes, assumption);
+                                    villainsRejectProposesWithoutVillains(votes, assumption) *
+                                    myRoleCertain(myRole, myPosition, assumption);
 
                 if (likelihood >= possibleThreshold) {
                     players[merlin].isMerlin += likelihood;
@@ -334,7 +355,7 @@
                     players[mordred].isMordred += likelihood;
                     players[mordred].isVillain += likelihood;
 
-                    if (noOfVillains > 3) {
+                    if (dummyInGame) {
                         players[dummy].isDummy += likelihood;
                         players[dummy].isVillain += likelihood;
                     }

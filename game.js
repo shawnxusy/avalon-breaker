@@ -2,6 +2,22 @@ var missionNumber = 0;
 var proposes = [];
 var votes = [];
 var missions = [];
+var requiredProposee;
+var myRole;
+var myPosition;
+
+// Game state and reusable classes
+var gameState;
+var propose;
+var vote;
+var mission;
+var testify;
+
+var currentlySelectedCount = 0;
+var currentlySelected = [];
+
+// For easier Display
+var actionButton;
 
 /*
     ---------------------------
@@ -14,16 +30,39 @@ var missions = [];
         $(".game").hide();
     }
 
+    // Game start
     function gameStartState(playerCount) {
         $(".pre-game").hide();
         $(".game").show();
 
         // Generate players UI
         for (var i = 0; i < playerCount; i++) {
-            var playerButton = $("<a class='player btn btn-primary'>" + i + "</div>");
-            $(".game-board").append($(playerButton));
+            var playerButton = $("<a class='player btn btn-primary' id='player-" + i + "'>" + i + "</div>");
+            $(".game-board-players").append($(playerButton));
         }
+        activateControlCallBack();
+
+        // Get the action button
+        actionButton = $("#action-button");
+        proposerSelectionState();
     }
+
+    function proposerSelectionState() {
+        gameState = "proposer-selection";
+        $(actionButton).text("Selecting proposer");
+    }
+
+    function proposeeSelectionState() {
+        gameState = "proposee-selection";
+        $(actionButton).text("Selecting proposee");
+    }
+
+    function voteState() {
+        gameState = "vote";
+        $(actionButton).text("Voting");
+        $(".player").removeClass("disabled");
+    }
+
 
 /*
     ---------------------------
@@ -32,30 +71,37 @@ var missions = [];
  */
     $("#game-start").click(function() {
         var noOfPlayers = $("#no-of-players").val();
+        myRole = $("#my-role").val();
+        myPosition = 0;
+        dummyInGame = $("#dummy-in-game").prop("checked");
         if (!isNaN(noOfPlayers) && (noOfPlayers >= 7) && (noOfPlayers <= 10)) {
             gameStart(noOfPlayers);
         }
     });
 
+    function activateControlCallBack() {
+        $(".player").click(function() {
+            // Get the player number
+            var playerId = parseInt($(this).text());
+            switch (gameState) {
+                case "proposer-selection":
+                    $(this).addClass("disabled");
+                    propose = new Propose(missionNumber, playerId, null);
+                    proposeeSelectionState();
+                    break;
+                case "proposee-selection":
+                    currentlySelected.push(playerId);
+                    $(this).addClass("disabled");
+                    currentlySelectedCount++;
+                    if (currentlySelectedCount === requiredProposee[missionNumber]) {
+                        propose.proposee = currentlySelected;
+                        proposes.push(propose);
+                        voteState();
+                    }
+                    break;
+            }
+        });
 
-    function onPropose(proposer, proposee) {
-        var propose = new Propose(missionNumber, proposer, proposee);
-        proposes.push(propose);
-        runDeduction();
-    }
-
-    function onVote() {
-        var vote = new Vote(missionNumber, proposee, agreed, disagreed);
-        votes.push(vote);
-        runDeduction();
-    }
-
-    function onMission() {
-        var mission = new Mission(missionNumber, team, result);
-        missions.push(mission);
-        runDeduction();
-
-        missionNumber++;
     }
 
 /*
@@ -68,16 +114,17 @@ var missions = [];
     function gameStart(playerCount) {
         // UI Stuff
         gameStartState(playerCount);
-        // Game Stuff
+        // Game Stuff Initialization
         noOfPlayers = playerCount;
         noOfHeroes = 2;
         noOfVillains = (noOfPlayers === 7) ? 3 : 4;
         noOfInnos = noOfPlayers - noOfHeroes - noOfVillains;
+        requiredProposee = (noOfPlayers <= 7) ? [2, 3, 3, 4, 4] : [3, 4, 4, 5, 5];
+        // Display stuff
         $("#status-no-of-players").text(noOfPlayers);
         $("#status-no-of-heroes").text(noOfHeroes);
         $("#status-no-of-villains").text(noOfVillains);
         $("#status-no-of-innos").text(noOfInnos);
-
     }
 
 
@@ -92,6 +139,9 @@ var missions = [];
         noOfVillains = 3;
         noOfHeroes = 2;
         noOfInnos = 2;
+        myRole = "merlin";
+        myPosition = 1;
+        dummyInGame = false;
 
         for (var i = 0; i < noOfPlayers; i++) {
             var player = new Player();

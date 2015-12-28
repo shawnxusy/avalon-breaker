@@ -1,7 +1,15 @@
+.player-group {
+  margin: 10px 15px 0 0;
+}
+
 .player {
-  margin: 10px 5px 0 0;
+  margin-right: 5px;
 }
 
 #cancel-button {
   margin-top: 10px;
+}
+
+.player-name {
+  width: 100px;
 }

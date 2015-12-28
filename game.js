@@ -43,7 +43,7 @@ var cancelButton;
 
         // Generate players UI
         for (var i = 0; i < playerCount; i++) {
-            var playerButton = $("<a class='player btn btn-primary' id='player-" + i + "'>" + i + "</div>");
+            var playerButton = $("<span class='player-group'><a class='player btn btn-primary' id='player-" + i + "'>" + i + "</a></span>");
             $(".game-board-players").append($(playerButton));
             completeUserArray.push(i);
         }
@@ -54,7 +54,16 @@ var cancelButton;
         $("#action-button-2").hide();
 
         activateControlCallBack();
-        proposerSelectionState();
+        playerNamingState();
+    }
+
+    function playerNamingState() {
+        gameState = "player-naming";
+        $(".player").each(function() {
+            var nameInput = $("<input type='text' class='player-name' id='player-name-" + $(this).text() + "'>");
+            $(this).parent().append($(nameInput));
+        });
+        $(actionButton).text("Naming complete");
     }
 
     function proposerSelectionState() {
@@ -144,6 +153,19 @@ var cancelButton;
 
         $(actionButton).click(function() {
             switch (gameState) {
+                case "player-naming":
+                    // Record the names and assign default value if not
+                    $(".player").each(function() {
+                        var name = $(this).next().val();
+                        $(this).next().remove();
+                        if (name === "") {
+                            $(this).parent().append($("<span class='player-name'>" + $(this).text() + "</span>"));
+                        } else {
+                            $(this).parent().append($("<span class='player-name'>" + name + "</span>"));
+                        }
+                    });
+                    proposerSelectionState();
+                    break;
                 case "vote":
                     vote.agreed = currentlySelected;
                     vote.disagreed = _.difference(completeUserArray, vote.agreed);
@@ -167,6 +189,7 @@ var cancelButton;
                     // Run deduction for so far
                     runDeduction();
                     proposerSelectionState();
+                    break;
             }
         });
 

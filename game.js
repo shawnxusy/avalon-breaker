@@ -5,6 +5,7 @@ var missions = [];
 var requiredProposee;
 var myRole;
 var myPosition;
+var globalState = [proposes, votes, missions]; // This is for better debugging
 
 // Game state and reusable classes
 var gameState;
@@ -15,9 +16,13 @@ var testify;
 
 var currentlySelectedCount = 0;
 var currentlySelected = [];
+var completeUserArray = [];
+
+var votedRounds = 0;
 
 // For easier Display
 var actionButton;
+var actionButton2;
 
 /*
     ---------------------------
@@ -39,17 +44,25 @@ var actionButton;
         for (var i = 0; i < playerCount; i++) {
             var playerButton = $("<a class='player btn btn-primary' id='player-" + i + "'>" + i + "</div>");
             $(".game-board-players").append($(playerButton));
+            completeUserArray.push(i);
         }
-        activateControlCallBack();
-
         // Get the action button
         actionButton = $("#action-button");
+        actionButton2 = $("#action-button-2");
+        $("#action-button-2").hide();
+
+        activateControlCallBack();
         proposerSelectionState();
     }
 
     function proposerSelectionState() {
         gameState = "proposer-selection";
         $(actionButton).text("Selecting proposer");
+        // Do cleaning
+        $(".player").removeClass("disabled");
+        currentlySelected = [];
+        currentlySelectedCount = 0;
+        console.log(globalState);
     }
 
     function proposeeSelectionState() {
@@ -59,8 +72,25 @@ var actionButton;
 
     function voteState() {
         gameState = "vote";
-        $(actionButton).text("Voting");
+        $(actionButton).text("Voting (select agreed)");
+        // Do cleaning
         $(".player").removeClass("disabled");
+        currentlySelected = [];
+        currentlySelectedCount = 0;
+        // Initialize the vote
+        vote = new Vote(missionNumber, propose.proposee, null, null);
+    }
+
+    function missionState() {
+        gameState = "mission";
+        $(actionButton).text("Mission succeeded");
+        $(actionButton2).show();
+        $(actionButton2).text("Mission Failed");
+        // Do cleaning
+        $(".player").removeClass("disabled");
+        currentlySelected = [];
+        currentlySelectedCount = 0;
+        votedRounds = 0;
     }
 
 
@@ -85,7 +115,6 @@ var actionButton;
             var playerId = parseInt($(this).text());
             switch (gameState) {
                 case "proposer-selection":
-                    $(this).addClass("disabled");
                     propose = new Propose(missionNumber, playerId, null);
                     proposeeSelectionState();
                     break;
@@ -96,12 +125,54 @@ var actionButton;
                     if (currentlySelectedCount === requiredProposee[missionNumber]) {
                         propose.proposee = currentlySelected;
                         proposes.push(propose);
-                        voteState();
+                        if (votedRounds === 4) { // If current round is the 5th round, go straight to mission
+                            missionState();
+                        } else {
+                            voteState();
+                        }
                     }
+                    break;
+                case "vote":
+                    currentlySelected.push(playerId);
+                    $(this).addClass("disabled");
+                    currentlySelectedCount++;
                     break;
             }
         });
 
+        $(actionButton).click(function() {
+            switch (gameState) {
+                case "vote":
+                    vote.agreed = currentlySelected;
+                    vote.disagreed = _.difference(completeUserArray, vote.agreed);
+                    votes.push(vote);
+
+                    if (vote.agreed.length > (noOfPlayers / 2)) {
+                        // Proceed with mission
+                        missionState();
+                    } else {
+                        // Go back to vote state
+                        votedRounds++;
+                        proposerSelectionState();
+                    }
+                    break;
+                case "mission":
+                    mission = new Mission(missionNumber, propose.proposee, "SUCCEEDED");
+                    missions.push(mission);
+                    missionNumber++;
+                    $(actionButton2).hide();
+                    proposerSelectionState();
+            }
+        });
+
+        $(actionButton2).click(function() {
+            // The game state should be at "mission" now
+            mission = new Mission(missionNumber, propose.proposee, "FAILED");
+            missions.push(mission);
+            missionNumber++;
+            $(actionButton2).hide();
+            proposerSelectionState();
+        });
     }
 
 /*

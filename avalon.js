@@ -336,12 +336,15 @@
                 var assumption = new Assumption(merlin, percival, morgana, assasin, mordred, dummy);
 
                 // chain each validator and calculate the likelihood
+                // to improve performance, for conditions that resulted in 0, skip the rest validators
+                var myrolecertain = myRoleCertain(myRole, myPosition, assumption);
+                var villainsinfailedmissions = villainsInFailedMissions(missions, assumption);
+                if ((myrolecertain === 0) || (villainsinfailedmissions === 0)) return;
+
                 var likelihood = 1 * merlinApproveVillainInVote(votes, assumption) *
                                     merlinProposeVillains(proposes, assumption) *
                                     villainProposeAnotherInRoundFour(proposes, assumption) *
-                                    villainsInFailedMissions(missions, assumption) *
-                                    villainsRejectProposesWithoutVillains(votes, assumption) *
-                                    myRoleCertain(myRole, myPosition, assumption);
+                                    villainsRejectProposesWithoutVillains(votes, assumption);
 
                 if (likelihood >= possibleThreshold) {
                     players[merlin].isMerlin += likelihood;

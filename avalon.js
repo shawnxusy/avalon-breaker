@@ -309,6 +309,7 @@
             only generate those with a higher possibility.
          */
         function runDeduction() {
+            players = [];
             for (var i = 0; i < noOfPlayers; i++) {
                 var player = new Player();
                 players.push(player);

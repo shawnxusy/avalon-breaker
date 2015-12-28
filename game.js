@@ -23,6 +23,7 @@ var votedRounds = 0;
 // For easier Display
 var actionButton;
 var actionButton2;
+var cancelButton;
 
 /*
     ---------------------------
@@ -49,6 +50,7 @@ var actionButton2;
         // Get the action button
         actionButton = $("#action-button");
         actionButton2 = $("#action-button-2");
+        cancelButton = $("#cancel-button");
         $("#action-button-2").hide();
 
         activateControlCallBack();
@@ -178,6 +180,13 @@ var actionButton2;
             // Run deduction for so far
             runDeduction();
             proposerSelectionState();
+        });
+
+        // The cancel button cancels the current selections
+        $(cancelButton).click(function() {
+            currentlySelected = [];
+            currentlySelectedCount = 0;
+            $(".player").removeClass("disabled");
         });
     }
 

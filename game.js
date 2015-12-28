@@ -161,6 +161,9 @@ var actionButton2;
                     missions.push(mission);
                     missionNumber++;
                     $(actionButton2).hide();
+
+                    // Run deduction for so far
+                    runDeduction();
                     proposerSelectionState();
             }
         });
@@ -171,6 +174,9 @@ var actionButton2;
             missions.push(mission);
             missionNumber++;
             $(actionButton2).hide();
+
+            // Run deduction for so far
+            runDeduction();
             proposerSelectionState();
         });
     }
@@ -180,7 +186,7 @@ var actionButton2;
     Game manager
     ---------------------------
  */
-    preGameState();
+    preGameState();  // Kicks everything off
 
     function gameStart(playerCount) {
         // UI Stuff
@@ -206,44 +212,51 @@ var actionButton2;
  */
     // Simple case: bad guy do bad things
     function t1() {
-        noOfPlayers = 7;
+        noOfPlayers = 8;
         noOfVillains = 3;
         noOfHeroes = 2;
-        noOfInnos = 2;
+        noOfInnos = 3;
         myRole = "merlin";
-        myPosition = 1;
+        myPosition = 0;
         dummyInGame = false;
 
-        for (var i = 0; i < noOfPlayers; i++) {
-            var player = new Player();
-            players.push(player);
-        }
         // In this test case:
-        // 1: Merlin, 2: Assasin; 3: Percival; 4: Mordred; 5: Morgana;
+        // 0: Merlin (me), 2: Assasin; 3: Percival; 4: Mordred; 5: Morgana; 1/6/7: Innocents;
 
-        // Round 1
-        var propose1 = new Propose(0, 1, [3,4,6]);
-        var vote1 = new Vote(0, [3,4,6], [1,6], [0,2,3,4,5]);
-        var propose2 = new Propose(0, 2, [2,4,0]);
-        var vote2 = new Vote(0, [2,4,0], [2,4,5], [1,3,6,0]);
-        var propose3 = new Propose(0, 3, [1,3,4]);
-        var vote3 = new Vote(0, [1,3,4], [1,2,3,4], [0,5,6]);
-        var mission1 = new Mission(0, [1,3,4], 'FAILED');
+        // Mission 1
+        var propose1 = new Propose(0, 0, [0,1,6]);
+        var vote1 = new Vote(0, [0,1,6], [0,6], [1,2,3,4,5,7]);
+        var propose2 = new Propose(0, 1, [0,1,2]);
+        var vote2 = new Vote(0, [0,1,2], [1,2], [0,3,4,5,6,7]);
+        var propose3 = new Propose(0, 2, [1,2,6]);
+        var vote3 = new Vote(0, [1,2,6], [2,6], [0,1,3,4,5,7]);
+        var propose4 = new Propose(0, 3, [0,1,3]);
+        var vote4 = new Vote(0, [0,1,3], [0,1,3,6,7], [2,4,5]);
 
-        // Round 2
-        var propose4 = new Propose(1, 4, [4,5,6]);
-        var vote4 = new Vote(1, [4,5,6], [4,5], [0,1,2,3,6]);
-        var propose5 = new Propose(1, 5, [3,5,6]);
-        var vote5 = new Vote(1, [3,5,6], [2,5], [0,1,3,4,6]);
-        var propose6 = new Propose(1, 6, [0,1,6]);
-        var vote6 = new Vote(1, [0,1,6], [0,1,3,6], [2,4,5]);
-        var mission2 = new Mission(1, [0,1,3,6], 'SUCCEEDED');
+        var mission1 = new Mission(1, [0,1,3], 'SUCCEEDED');
 
-        // Round 3
-        var propose7 = new Propose(2, 0, [0,2,3,6]);
-        var vote7 = new Vote(2, [0,2,3,6], [2,0,5], [1,3,4,6]);
-        var propose8 = new Propose(2, 1, [0,1,6,3]);
-        var vote8 = new Vote(2, [0,1,6,3], [0,2,3,6], [2,4,5]);
+        // Mission 2
+        var propose5 = new Propose(1, 4, [0,1,3,4]);
+        var vote5 = new Vote(1, [0,1,3,4], [2,4], [0,1,3,5,6,7]);
+        var propose6 = new Propose(1, 5, [0,1,3,5]);
+        var vote6 = new Vote(1, [0,1,3,5], [4,5], [0,1,2,3,6,7]);
+        var propose7 = new Propose(1, 6, [0,1,3,6]);
+        var vote7 = new Vote(1, [0,1,3,6], [0,1,3,6], [2,4,5,7]);
+        var propose8 = new Propose(1, 7, [0,1,5,7]);
+        var vote8 = new Vote(1, [0,1,5,7], [2,4,5,6,7], [0,1,3]);
+
+        var mission2 = new Mission(1, [0,1,5,7], 'FAILED');
+
+        // Mission 3
+        var propose9 = new Propose(2, 0, [0,1,3,6]);
+        var vote9 = new Vote(2, [0,1,3,6], [0,1,3,6], [2,4,5,7]);
+        var propose10 = new Propose(2, 1, [0,1,4,6]);
+        var vote10 = new Vote(2, [0,1,4,6], [2,4,5], [0,1,3,6,7]);
+        var propose11 = new Propose(2, 2, [0,1,2,6]);
+        var vote11 = new Vote(2, [0,1,2,6], [2,4,5,7], [0,1,3,6]);
+        var propose12 = new Propose(2, 3, [0,1,3,6]);
+        var vote12 = new Vote(2, [0,1,3,6], [0,1,3,6,7], [2,4,5]);
+
         var mission3 = new Mission(2, [0,1,3,6], 'SUCCEEDED');
 
         missions.push(mission1);
@@ -258,6 +271,10 @@ var actionButton2;
         proposes.push(propose6);
         proposes.push(propose7);
         proposes.push(propose8);
+        proposes.push(propose9);
+        proposes.push(propose10);
+        proposes.push(propose11);
+        proposes.push(propose12);
 
         votes.push(vote1);
         votes.push(vote2);
@@ -267,9 +284,10 @@ var actionButton2;
         votes.push(vote6);
         votes.push(vote7);
         votes.push(vote8);
+        votes.push(vote9);
+        votes.push(vote10);
+        votes.push(vote11);
+        votes.push(vote12);
 
         runDeduction();
-
-        console.log(players);
-
     }

@@ -309,10 +309,13 @@
             only generate those with a higher possibility.
          */
         function runDeduction() {
-
-            var initialArray = []; // [0,1,2,3,4,...]
             for (var i = 0; i < noOfPlayers; i++) {
-                initialArray.push(i);
+                var player = new Player();
+                players.push(player);
+            }
+            var initialArray = []; // [0,1,2,3,4,...]
+            for (var j = 0; j < noOfPlayers; j++) {
+                initialArray.push(j);
             }
             // Permutation for [0,1,2,3] -> [ [0,1,2,3], [1,0,2,3], [0,1,3,2],... ]
             var permutations = initialArray.reduce(function permute(res, item, key, arr) {
@@ -361,7 +364,7 @@
                     }
                 }
             });
-
+            console.log(players);
         }
 
 

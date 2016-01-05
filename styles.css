@@ -1,15 +1,52 @@
+body {
+  background-color: #424444;
+  color: #f6f6f5;
+  font-size: 14px;
+}
+.title {
+  padding: 20px 5% 0 5%;
+  text-align: center;
+}
+.title img {
+  width: 90%;
+}
+.pre-game {
+  margin-top: 20px;
+  text-align: center;
+}
+.pre-game .list-item {
+  margin-top: 15px;
+}
+.pre-game .list-item label {
+  left: 10%;
+}
+.pre-game #no-of-players,
+.pre-game #my-role {
+  width: 20%;
+  height: 22px;
+  color: #f6f6f5;
+  text-align: right;
+  border-color: #f6f6f5;
+  background-color: inherit;
+  border-radius: 0;
+}
+.pre-game #game-start {
+  margin-top: 15px;
+  width: 20%;
+  padding: 3px 12px 3px 12px;
+  background-color: inherit;
+  color: #f6f6f5;
+  border-color: #f6f6f5;
+}
 .player-group {
   margin: 10px 15px 0 0;
 }
-
 .player {
   margin-right: 5px;
 }
-
 #cancel-button {
   margin-top: 10px;
 }
-
 .player-name {
   width: 100px;
 }

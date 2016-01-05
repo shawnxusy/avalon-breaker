@@ -14,6 +14,8 @@ var vote;
 var mission;
 var testify;
 
+var proposerSelected = false;
+var currentProposer = null;
 var currentlySelectedCount = 0;
 var currentlySelected = [];
 var completeUserArray = [];
@@ -71,14 +73,18 @@ var cancelButton;
         $(actionButton).text("Selecting proposer");
         // Do cleaning
         $(".player").removeClass("disabled");
+        proposerSelected = false;
+        currentProposer = null;
         currentlySelected = [];
         currentlySelectedCount = 0;
         console.log(globalState);
     }
 
     function proposeeSelectionState() {
+        // Do cleaning
+        $(".player").removeClass("disabled");
         gameState = "proposee-selection";
-        $(actionButton).text("Selecting proposee");
+        $(actionButton).text("Select " + requiredProposee[missionNumber] + " proposees");
     }
 
     function voteState() {
@@ -126,21 +132,17 @@ var cancelButton;
             var playerId = parseInt($(this).text());
             switch (gameState) {
                 case "proposer-selection":
-                    propose = new Propose(missionNumber, playerId, null);
-                    proposeeSelectionState();
+                    if (!proposerSelected) {
+                        proposerSelected = true;
+                        currentProposer = playerId;
+                        $(this).addClass("disabled");
+                    }
                     break;
                 case "proposee-selection":
-                    currentlySelected.push(playerId);
-                    $(this).addClass("disabled");
-                    currentlySelectedCount++;
-                    if (currentlySelectedCount === requiredProposee[missionNumber]) {
-                        propose.proposee = currentlySelected;
-                        proposes.push(propose);
-                        if (votedRounds === 4) { // If current round is the 5th round, go straight to mission
-                            missionState();
-                        } else {
-                            voteState();
-                        }
+                    if (currentlySelectedCount < requiredProposee[missionNumber]) {
+                        currentlySelected.push(playerId);
+                        $(this).addClass("disabled");
+                        currentlySelectedCount++;
                     }
                     break;
                 case "vote":
@@ -165,6 +167,23 @@ var cancelButton;
                         }
                     });
                     proposerSelectionState();
+                    break;
+                case "proposer-selection":
+                    if (proposerSelected) {
+                        propose = new Propose(missionNumber, currentProposer, null);
+                        proposeeSelectionState();
+                    }
+                    break;
+                case "proposee-selection":
+                    if (currentlySelectedCount === requiredProposee[missionNumber]) {
+                        propose.proposee = currentlySelected;
+                        proposes.push(propose);
+                        if (votedRounds === 4) { // If current round is the 5th round, go straight to mission
+                            missionState();
+                        } else {
+                            voteState();
+                        }
+                    }
                     break;
                 case "vote":
                     vote.agreed = currentlySelected;
@@ -226,7 +245,7 @@ var cancelButton;
         // Game Stuff Initialization
         noOfPlayers = playerCount;
         noOfHeroes = 2;
-        noOfVillains = (noOfPlayers === 7) ? 3 : 4;
+        noOfVillains = dummyInGame ? 4 : 3;
         noOfInnos = noOfPlayers - noOfHeroes - noOfVillains;
         requiredProposee = (noOfPlayers <= 7) ? [2, 3, 3, 4, 4] : [3, 4, 4, 5, 5];
         // Display stuff

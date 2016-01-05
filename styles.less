@@ -1,0 +1,63 @@
+body {
+  background-color: @main-grey;
+  color: @main-white;
+  font-size: 14px;
+}
+
+.title {
+    padding: 20px 5% 0 5%;
+    text-align: center;
+    img {
+        width: 90%;
+    }
+}
+
+.pre-game {
+    margin-top: 20px;
+    text-align: center;
+
+    .list-item {
+        margin-top: 15px;
+        label {
+            left: 10%;
+        }
+    }
+
+    #no-of-players, #my-role {
+        width: 20%;
+        height: 22px;
+        color: @main-white;
+        text-align: right;
+        border-color: @main-white;
+        background-color: inherit;
+        border-radius: 0;
+    }
+
+    #game-start {
+        margin-top: 15px;
+        width: 20%;
+        padding: 3px 12px 3px 12px;
+        background-color: inherit;
+        color: @main-white;
+        border-color: @main-white;
+    }
+}
+
+.player-group {
+  margin: 10px 15px 0 0;
+}
+
+.player {
+  margin-right: 5px;
+}
+
+#cancel-button {
+  margin-top: 10px;
+}
+
+.player-name {
+  width: 100px;
+}
+
+@main-grey: #424444;
+@main-white: #f6f6f5;
